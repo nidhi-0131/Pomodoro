@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pomodoro Timer</title>
+  <style>
+    * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    }
+
+    body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ff6b6b, #ffb347);
+    }
+
+    body.dark {
+    background: linear-gradient(135deg, #1e1e1e, #3a3a3a);
+    }
+
+    .container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 100%;
+    max-width: 350px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    body.dark .container {
+    background: #2c2c2c;
+    color: #ffffff;
+    }
+
+    h1 {
+    margin-bottom: 15px;
+    }
+
+    .timer {
+    font-size: 64px;
+    font-weight: bold;
+    margin: 15px 0;
+    }
+
+    .session {
+    margin-bottom: 15px;
+    }
+
+    .buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    }
+
+    .buttons button,
+    .toggle {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    }
+
+    .start { background: #4caf50; color: white; }
+    .pause { background: #ff9800; color: white; }
+    .reset { background: #f44336; color: white; }
+
+    .toggle {
+    background: #555;
+    color: white;
+    }
+
+    .buttons button:hover,
+    .toggle:hover {
+    opacity: 0.9;
+    }
+
+    @media (max-width: 480px) {
+    .timer {
+        font-size: 52px;
+        }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍅 Pomodoro Timer</h1>
+
+    <div class="timer" id="timer">25:00</div>
+    <p class="session">Sessions Completed: <span id="sessions">0</span></p>
+
+    <div class="buttons">
+      <button onclick="setPomodoro()">Pomodoro</button>
+      <button onclick="setShortBreak()">Short Break</button>
+      <button onclick="setLongBreak()">Long Break</button>
+    </div>
+
+    <div class="buttons">
+      <button class="start" onclick="startTimer()">Start</button>
+      <button class="pause" onclick="pauseTimer()">Pause</button>
+      <button class="reset" onclick="resetTimer()">Reset</button>
+    </div>
+
+    <button class="toggle" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+  </div>
+
+  <audio id="alarm">
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+  </audio>
+
+  <script>
+    let time = 25 * 60;
+    let timerInterval = null;
+    let sessions = 0;
+
+    const timerEl = document.getElementById("timer");
+    const sessionsEl = document.getElementById("sessions");
+    const alarm = document.getElementById("alarm");
+
+    function updateDisplay() {
+      const minutes = Math.floor(time / 60);
+      const seconds = time % 60;
+      timerEl.innerText = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    }
+
+    function startTimer() {
+      if (timerInterval) return;
+      timerInterval = setInterval(() => {
+        if (time > 0) {
+          time--;
+          updateDisplay();
+        } else {
+          alarm.play();
+          clearInterval(timerInterval);
+          timerInterval = null;
+          sessions++;
+          sessionsEl.innerText = sessions;
+          alert("Time's up! Switch mode 🚀");
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      updateDisplay();
+    }
+
+    function setPomodoro() {
+      pauseTimer();
+      time = 25 * 60;
+      updateDisplay();
+    }
+
+    function setShortBreak() {
+      pauseTimer();
+      time = 5 * 60;
+      updateDisplay();
+    }
+
+    function setLongBreak() {
+      pauseTimer();
+      time = 15 * 60;
+      updateDisplay();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+
+    updateDisplay();
+  </script>
+</body>
+</html>
